@@ -1,26 +1,9 @@
-import {
-  Autocomplete,
-  Avatar,
-  Box,
-  Button,
-  Container,
-  FormGroup,
-  FormHelperText,
-  Grid,
-  TextField,
-  Typography,
-} from "@mui/material";
-import CssBaseline from "@mui/material/CssBaseline";
+import { Avatar, Box, Container, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
-import { AddBusinessRounded, NavigateNextRounded } from "@mui/icons-material";
-import { Form, Formik, Field, FieldProps } from "formik";
+import { AddBusinessRounded } from "@mui/icons-material";
+import { Formik } from "formik";
 import * as Yup from "yup";
-import {
-  countries,
-  countriesWithStates,
-  CountryType,
-  CountryWithState,
-} from "../../data";
+import { countriesWithStates, CountryWithState } from "../../data";
 import { ICompanyRegistration } from "../../interfaces/company";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
@@ -28,12 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { reset, registerCompany } from "../../features/auth/companyAuthSlice";
 import { AnyAction } from "@reduxjs/toolkit";
-import {
-  ReusableAutocomplete,
-  ReusableCountryAutocomplete,
-  ReusableCountryStateAutocomplete,
-  ReusableTextField,
-} from "../../components/Inputs";
+import CompanyRegistrationForm from "./SignupForms/CompanyRegistrationForm";
+import { AutocompleteOptionProps } from "../../components/Inputs";
 
 interface IProps {
   setTransition: React.Dispatch<React.SetStateAction<boolean>>;
@@ -45,7 +24,7 @@ const CompanyRegistration: React.FC<IProps> = ({ setTransition }) => {
     useState<Partial<ICompanyRegistration>>(initialValues);
 
   const [selectedCountry, setSelectedCountry] = useState<string>();
-  const [countryStateData, setCountryStateData] = useState<string[]>([]);
+  const [countryStateData, setCountryStateData] = useState<AutocompleteOptionProps[]>([]);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required().label("Company Name"),
@@ -57,7 +36,7 @@ const CompanyRegistration: React.FC<IProps> = ({ setTransition }) => {
 
   useEffect(() => {
     selectedCountry &&
-      countriesWithStates.find((value: CountryWithState) => {
+      countriesWithStates.find((value: AutocompleteOptionProps) => {
         if (value.country === selectedCountry) {
           setCountryStateData(value.states);
         }
@@ -139,301 +118,11 @@ const CompanyRegistration: React.FC<IProps> = ({ setTransition }) => {
           }}
         >
           {({ values, errors, handleChange, handleSubmit }) => (
-            <Box
-              component={Form}
-              noValidate
-              onSubmit={handleSubmit}
-              sx={{
-                mt: 3,
-                mb: 3,
-                px: 4,
-              }}
-            >
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                  {/* <Field name="name">
-                    {({
-                      field: { name, value, onChange, ...field },
-                      form: { touched, errors, handleChange }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
-                      meta,
-                    }: FieldProps) => (
-                      <>
-                        <FormGroup>
-                          <TextField
-                            type="text"
-                            label="Company Name"
-                            {...field}
-                            onChange={(
-                              event: React.ChangeEvent<HTMLInputElement>
-                            ) => {
-                              onChange({
-                                ...event,
-                                target: {
-                                  ...event.target,
-                                  id: "name",
-                                  name: "name",
-                                  value: event.target.value,
-                                },
-                              });
-                            }}
-                            error={!!(touched && errors.name)}
-                            fullWidth
-                          />
-                          {touched && errors.name && (
-                            <FormHelperText error>
-                              {String(errors.name)}
-                            </FormHelperText>
-                          )}
-                        </FormGroup>
-                      </>
-                    )}
-                  </Field> */}
-                  <ReusableTextField
-                    name="name"
-                    label="Company Name"
-                    type="text"
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  {/* <Field name="country">
-                    {({
-                      field: { name, value, onChange, ...field },
-                      form: { touched, errors, handleChange }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
-                      meta,
-                    }: FieldProps) => (
-                      <>
-                        <FormGroup>
-                          <Autocomplete
-                            fullWidth
-                            sx={{}}
-                            options={countries}
-                            autoHighlight
-                            getOptionLabel={(option) => option.label}
-                            onChange={(
-                              event: React.SyntheticEvent<Element, Event>,
-                              value: CountryType | null
-                            ) => {
-                              onChange({
-                                ...event,
-                                target: {
-                                  ...event.target,
-                                  id: "country",
-                                  name: "country",
-                                  value: value?.label,
-                                },
-                              });
-
-                              setSelectedCountry(value?.label);
-                            }}
-                            renderOption={(props, option) => (
-                              <Box
-                                component="li"
-                                sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                                {...props}
-                              >
-                                <img
-                                  loading="lazy"
-                                  width="20"
-                                  src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-                                  srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-                                  alt=""
-                                />
-                                {option.label} ({option.code}) +{option.phone}
-                              </Box>
-                            )}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                {...field}
-                                label="Choose a country"
-                                inputProps={{
-                                  ...params.inputProps,
-                                  autoComplete: "new-password", // disable autocomplete and autofill
-                                }}
-                                error={!!(touched && errors.country)}
-                                fullWidth
-                              />
-                            )}
-                          />
-                          {touched && errors.country && (
-                            <FormHelperText error>
-                              {String(errors.country)}
-                            </FormHelperText>
-                          )}
-                        </FormGroup>
-                      </>
-                    )}
-                  </Field> */}
-                  <ReusableCountryAutocomplete
-                    name="country"
-                    label="Choose a country"
-                    countries={countries}
-                    setSelectedCountry={setSelectedCountry}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  {/* <Field name="email">
-                    {({
-                      field: { name, value, onChange, ...field },
-                      form: { touched, errors, handleChange }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
-                      meta,
-                    }: FieldProps) => (
-                      <>
-                        <FormGroup>
-                          <TextField
-                            type="email"
-                            label="Email Address"
-                            {...field}
-                            onChange={(
-                              event: React.ChangeEvent<HTMLInputElement>
-                            ) => {
-                              onChange({
-                                ...event,
-                                target: {
-                                  ...event.target,
-                                  id: "email",
-                                  name: "email",
-                                  value: event.target.value,
-                                },
-                              });
-                            }}
-                            fullWidth
-                            error={!!(touched && errors.email)}
-                          />
-                          {touched && errors.email && (
-                            <FormHelperText error>
-                              {String(errors.email)}
-                            </FormHelperText>
-                          )}
-                        </FormGroup>
-                      </>
-                    )}
-                  </Field> */}
-                  <ReusableTextField
-                    name="email"
-                    label="Email Address"
-                    type="email"
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  {/* <Field name="state">
-                    {({
-                      field: { name, value, onChange, ...field },
-                      form: { touched, errors, handleChange }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
-                      meta,
-                    }: FieldProps) => (
-                      <>
-                        <FormGroup>
-                          <Autocomplete
-                            fullWidth
-                            sx={{}}
-                            options={countryStateData}
-                            autoHighlight
-                            onChange={(
-                              event: React.SyntheticEvent<Element, Event>,
-                              value: string | null
-                            ) => {
-                              onChange({
-                                ...event,
-                                target: {
-                                  ...event.target,
-                                  id: "state",
-                                  name: "state",
-                                  value: value,
-                                },
-                              });
-                              //console.log(value);
-                            }}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                label="Choose a state"
-                                error={!!(touched && errors.state)}
-                              />
-                            )}
-                          />
-                          {touched && errors.state && (
-                            <FormHelperText error>
-                              {String(errors.state)}
-                            </FormHelperText>
-                          )}
-                        </FormGroup>
-                      </>
-                    )}
-                  </Field> */}
-                  <ReusableCountryStateAutocomplete
-                    name="state"
-                    label="Choose a state"
-                    options={countryStateData}
-                  />
-                </Grid>
-
-                <Grid item xs={12}>
-                  {/* <Field name="address">
-                    {({
-                      field: { name, value, onChange, ...field },
-                      form: { touched, errors, handleChange }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
-                      meta,
-                    }: FieldProps) => (
-                      <>
-                        <FormGroup>
-                          <TextField
-                            type="text"
-                            label="Company Address"
-                            {...field}
-                            onChange={(
-                              event: React.ChangeEvent<HTMLInputElement>
-                            ) => {
-                              onChange({
-                                ...event,
-                                target: {
-                                  ...event.target,
-                                  id: "address",
-                                  name: "address",
-                                  value: event.target.value,
-                                },
-                              });
-                            }}
-                            error={!!(touched && errors.address)}
-                            fullWidth
-                            multiline
-                            rows={2}
-                          />
-                          {touched && errors.address && (
-                            <FormHelperText error>
-                              {String(errors.address)}
-                            </FormHelperText>
-                          )}
-                        </FormGroup>
-                      </>
-                    )}
-                  </Field> */}
-                  <ReusableTextField
-                    name="address"
-                    type="text"
-                    label="Company Address"
-                    multiline
-                    rows={2}
-                  />
-                </Grid>
-              </Grid>
-
-              <Button
-                sx={{
-                  mt: 3,
-                  backgroundColor: "#6a5acd",
-                  float: "right",
-                }}
-                variant="contained"
-                endIcon={<NavigateNextRounded />}
-                type="submit"
-              >
-                PROCEED
-              </Button>
-            </Box>
+            <CompanyRegistrationForm
+              handleSubmit={handleSubmit}
+              setSelectedCountry={setSelectedCountry}
+              countryStateData={countryStateData}
+            />
           )}
         </Formik>
       </Box>

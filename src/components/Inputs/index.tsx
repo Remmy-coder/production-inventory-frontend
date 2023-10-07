@@ -1,14 +1,11 @@
-import { PriorityHighRounded } from "@mui/icons-material";
 import {
   Autocomplete,
   FormGroup,
   FormHelperText,
   TextField,
-  Tooltip,
 } from "@mui/material";
-import { height } from "@mui/system";
 import { Field, FieldProps } from "formik";
-import { CountryType } from "../data";
+import { CountryType } from "../../data";
 import CountryInput from "./CountryInput";
 
 interface ReusableComponentsPropBase {
@@ -17,7 +14,7 @@ interface ReusableComponentsPropBase {
   [key: string]: any;
 }
 
-interface AutocompleteOptionProps {
+export interface AutocompleteOptionProps {
   [key: string | number]: any;
 }
 
@@ -34,9 +31,9 @@ interface ReusableCountryAutocompleteProps extends ReusableComponentsPropBase {
   setSelectedCountry: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-interface ReusableStateAutocompleteProps extends ReusableComponentsPropBase {
-  options: string[];
-}
+// interface ReusableStateAutocompleteProps extends ReusableComponentsPropBase {
+//   options: string[];
+// }
 
 export const ReusableTextField: React.FC<ReusableTextFieldProps> = ({
   name,
@@ -88,14 +85,14 @@ export const ReusableAutocomplete: React.FC<ReusableAutocompleteProps> = ({
                 options={options}
                 autoHighlight
                 onChange={(
-                  event: React.SyntheticEvent<Element, Event>,
+                  event:  any,
                   value: AutocompleteOptionProps | null
                 ) => {
                   field.onChange({
                     target: {
                       id: name,
                       name,
-                      value: value ? value.value : "",
+                      value: event.target.innerText,
                     },
                   });
                 }}
@@ -115,45 +112,45 @@ export const ReusableAutocomplete: React.FC<ReusableAutocompleteProps> = ({
   );
 };
 
-export const ReusableCountryStateAutocomplete: React.FC<
-  ReusableStateAutocompleteProps
-> = ({ name, label, options }) => {
-  return (
-    <>
-      <Field name={name}>
-        {({ field, meta }: FieldProps) => (
-          <>
-            <FormGroup>
-              <Autocomplete
-                fullWidth
-                options={options}
-                autoHighlight
-                onChange={(
-                  event: React.SyntheticEvent<Element, Event>,
-                  value: string | null
-                ) => {
-                  field.onChange({
-                    target: {
-                      id: "state",
-                      name: "state",
-                      value: value,
-                    },
-                  });
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label={label} error={!!meta.error} />
-                )}
-              />
-              {meta.error && (
-                <FormHelperText error>{String(meta.error)}</FormHelperText>
-              )}
-            </FormGroup>
-          </>
-        )}
-      </Field>
-    </>
-  );
-};
+// export const ReusableCountryStateAutocomplete: React.FC<
+//   ReusableStateAutocompleteProps
+// > = ({ name, label, options }) => {
+//   return (
+//     <>
+//       <Field name={name}>
+//         {({ field, meta }: FieldProps) => (
+//           <>
+//             <FormGroup>
+//               <Autocomplete
+//                 fullWidth
+//                 options={options}
+//                 autoHighlight
+//                 onChange={(
+//                   event: React.SyntheticEvent<Element, Event>,
+//                   value: string | null
+//                 ) => {
+//                   field.onChange({
+//                     target: {
+//                       id: "state",
+//                       name: "state",
+//                       value: value,
+//                     },
+//                   });
+//                 }}
+//                 renderInput={(params) => (
+//                   <TextField {...params} label={label} error={!!meta.error} />
+//                 )}
+//               />
+//               {meta.error && (
+//                 <FormHelperText error>{String(meta.error)}</FormHelperText>
+//               )}
+//             </FormGroup>
+//           </>
+//         )}
+//       </Field>
+//     </>
+//   );
+// };
 
 export const ReusableCountryAutocomplete: React.FC<
   ReusableCountryAutocompleteProps

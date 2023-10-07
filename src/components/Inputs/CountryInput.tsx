@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import { Field, FieldProps } from "formik";
 import React from "react";
-import { CountryType } from "../data";
+import { CountryType } from "../../data";
 
 const CountryInput: React.FC<{ [key: string]: any }> = ({ props }) => {
   return (
