@@ -199,7 +199,7 @@ const UserCreationForm: React.FC<IUserCreationFormProp> = (props) => {
           <Button
             sx={{
               mt: 3,
-              backgroundColor: "#FF7F50",
+              backgroundColor: "slateblue",
               float: "right",
             }}
             variant="contained"

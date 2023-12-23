@@ -13,9 +13,10 @@ import { reset, registerCompany } from "../../features/auth/companyAuthSlice";
 import { AnyAction } from "@reduxjs/toolkit";
 import CompanyRegistrationForm from "./SignupForms/CompanyRegistrationForm";
 import { AutocompleteOptionProps } from "../../components/Inputs";
+import { RegistrationFlow } from ".";
 
 interface IProps {
-  setTransition: React.Dispatch<React.SetStateAction<boolean>>;
+  setTransition: React.Dispatch<React.SetStateAction<RegistrationFlow>>;
 }
 
 const CompanyRegistration: React.FC<IProps> = ({ setTransition }) => {
@@ -24,7 +25,9 @@ const CompanyRegistration: React.FC<IProps> = ({ setTransition }) => {
     useState<Partial<ICompanyRegistration>>(initialValues);
 
   const [selectedCountry, setSelectedCountry] = useState<string>();
-  const [countryStateData, setCountryStateData] = useState<AutocompleteOptionProps[]>([]);
+  const [countryStateData, setCountryStateData] = useState<
+    AutocompleteOptionProps[]
+  >([]);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required().label("Company Name"),
@@ -56,7 +59,7 @@ const CompanyRegistration: React.FC<IProps> = ({ setTransition }) => {
     }
     if (isSuccess) {
       toast.success("Company created");
-      setTransition(true);
+      setTransition(RegistrationFlow.userRegistration);
     }
 
     dispatch(reset());
@@ -114,7 +117,7 @@ const CompanyRegistration: React.FC<IProps> = ({ setTransition }) => {
           onSubmit={(data) => {
             //handleSubmit(data);
             console.log(data);
-            setTransition(true);
+            setTransition(RegistrationFlow.userRegistration);
           }}
         >
           {({ values, errors, handleChange, handleSubmit }) => (

@@ -109,7 +109,7 @@ const UserCreation: React.FC = () => {
         <Avatar
           sx={{
             margin: 1,
-            backgroundColor: "#FF7F50",
+            backgroundColor: "slateblue",
             height: 70,
             width: 70,
           }}
@@ -126,8 +126,8 @@ const UserCreation: React.FC = () => {
           validateOnBlur={false}
           validateOnMount={false}
           onSubmit={(data) => {
-            //handleSubmit(data);
-            console.log(data);
+            handleSubmit(data);
+            //console.log(data);
           }}
         >
           {({ values, errors, handleChange, handleSubmit }) => (
