@@ -1,20 +1,48 @@
 import { ShieldRounded } from "@mui/icons-material";
 import { Avatar, Typography } from "@mui/material";
 import { Box, Container } from "@mui/system";
-import { Formik } from "formik";
+import { FormikProvider, useFormik } from "formik";
 import { useState } from "react";
 import * as Yup from "yup";
 import OtpVerificationForm from "./LoginForms/OtpVerificationForm";
+import { useOtpValidationMutation } from "../../services/authApi";
+import { IOTPValidation } from "../../interfaces/auth";
+import { useNavigate } from "react-router-dom";
 
 const OtpVerification: React.FC = () => {
   const initialValues = {};
-  const [initialState, setInitialState] = useState<{ [field: string]: any }>(
-    initialValues
-  );
+  const [initialState, setInitialState] =
+    useState<Partial<IOTPValidation>>(initialValues);
+
+  const navigate = useNavigate();
+
+  const loggedInUserId: string | null = localStorage.getItem("loggedInUserId");
+
+  const [otpValidation] = useOtpValidationMutation();
 
   const validationSchema = Yup.object().shape({
-    otp: Yup.string().required().label("OTP"),
+    otp: Yup.number().typeError("OTP is a number").required().label("OTP"),
   });
+
+  const OtpFormik = useFormik({
+    initialValues: initialState,
+    validationSchema: validationSchema,
+    validateOnChange: true,
+    validateOnBlur: false,
+    validateOnMount: false,
+    onSubmit: async (data) => {
+      //console.log(data.otp);
+      const apiQuery: any = await otpValidation({
+        otp: data.otp,
+        userId: loggedInUserId,
+      });
+
+      if (apiQuery?.data?.success) {
+        navigate("/dashboard");
+      }
+    },
+  });
+
   return (
     <Container
       component="main"
@@ -53,20 +81,9 @@ const OtpVerification: React.FC = () => {
         <Typography component="h1" variant="h5" gutterBottom>
           OTP Verification
         </Typography>
-        <Formik
-          initialValues={initialState}
-          validationSchema={validationSchema}
-          validateOnChange={true}
-          validateOnBlur={false}
-          validateOnMount={false}
-          onSubmit={(data) => {
-            console.log(data);
-          }}
-        >
-          {({ values, errors, handleChange, handleSubmit }) => (
-            <OtpVerificationForm handleSubmit={handleSubmit} />
-          )}
-        </Formik>
+        <FormikProvider value={OtpFormik}>
+          <OtpVerificationForm handleSubmit={OtpFormik.handleSubmit} />
+        </FormikProvider>
       </Box>
     </Container>
   );

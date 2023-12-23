@@ -5,36 +5,37 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { countriesWithStates, CountryWithState } from "../../data";
 import { ICompanyRegistration } from "../../interfaces/company";
-import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { reset, registerCompany } from "../../features/auth/companyAuthSlice";
 import { AnyAction } from "@reduxjs/toolkit";
 import CompanyRegistrationForm from "./SignupForms/CompanyRegistrationForm";
 import { AutocompleteOptionProps } from "../../components/Inputs";
 import { RegistrationFlow } from ".";
+import { useCreateCompanyMutation } from "../../services/companyApi";
 
 interface IProps {
   setTransition: React.Dispatch<React.SetStateAction<RegistrationFlow>>;
 }
 
 const CompanyRegistration: React.FC<IProps> = ({ setTransition }) => {
-  const initialValues = {};
+  const initialValues = {} as unknown as ICompanyRegistration;
   const [initialState, setInitialState] =
-    useState<Partial<ICompanyRegistration>>(initialValues);
+    useState<ICompanyRegistration>(initialValues);
 
   const [selectedCountry, setSelectedCountry] = useState<string>();
   const [countryStateData, setCountryStateData] = useState<
     AutocompleteOptionProps[]
   >([]);
 
+  const [createCompany] = useCreateCompanyMutation();
+
   const validationSchema = Yup.object().shape({
     name: Yup.string().required().label("Company Name"),
     email: Yup.string().email().required().label("Email Address"),
     country: Yup.string().required().label("Country"),
     state: Yup.string().required().label("State"),
-    address: Yup.string().required().label("Company Address"),
+    address: Yup.string().required().label("Company's Address"),
   });
 
   useEffect(() => {
@@ -46,27 +47,12 @@ const CompanyRegistration: React.FC<IProps> = ({ setTransition }) => {
       });
   }, [selectedCountry]);
 
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const handleSubmitForCompanyCreation = async (data: ICompanyRegistration) => {
+    const apiQuery: any = await createCompany(data);
 
-  const { company, isLoading, isError, isSuccess, message } = useSelector(
-    (state: RootState) => state.companyAuth
-  );
-
-  useEffect(() => {
-    if (isError) {
-      toast.error(message);
-    }
-    if (isSuccess) {
-      toast.success("Company created");
+    if (apiQuery?.data?.success) {
       setTransition(RegistrationFlow.userRegistration);
     }
-
-    dispatch(reset());
-  }, [company, isError, isSuccess, message, setTransition, dispatch]);
-
-  const handleSubmit = (data: Partial<ICompanyRegistration>) => {
-    dispatch(registerCompany(data) as unknown as AnyAction);
   };
 
   return (
@@ -115,9 +101,7 @@ const CompanyRegistration: React.FC<IProps> = ({ setTransition }) => {
           validateOnBlur={false}
           validateOnMount={false}
           onSubmit={(data) => {
-            //handleSubmit(data);
-            console.log(data);
-            setTransition(RegistrationFlow.userRegistration);
+            handleSubmitForCompanyCreation(data);
           }}
         >
           {({ values, errors, handleChange, handleSubmit }) => (

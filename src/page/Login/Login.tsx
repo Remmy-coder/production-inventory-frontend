@@ -1,24 +1,26 @@
 import { LoginRounded } from "@mui/icons-material";
 import { Avatar, Box, Container, Typography } from "@mui/material";
 import { Formik } from "formik";
-import React, { useState } from "react";
-import { IUserRegistration } from "../../interfaces/user";
+import React, { useState, useEffect } from "react";
 import * as Yup from "yup";
 import LoginForm from "./LoginForms/LoginForm";
 import { LoginFlow } from ".";
+import { ILogin } from "../../interfaces/auth";
+import { useLoginUserMutation } from "../../services/authApi";
 
 interface IProps {
   setTransition: React.Dispatch<React.SetStateAction<LoginFlow>>;
 }
 
 const UserLogin: React.FC<IProps> = (props) => {
-  const initialValues = {};
-  const [initialState, setInitialState] =
-    useState<Partial<IUserRegistration>>(initialValues);
+  const initialValues = {} as unknown as ILogin;
+  const [initialState, setInitialState] = useState<ILogin>(initialValues);
 
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const [loginUser] = useLoginUserMutation();
 
   const handleMouseDownPassword = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -30,6 +32,14 @@ const UserLogin: React.FC<IProps> = (props) => {
     email: Yup.string().email().required().label("Email Address"),
     password: Yup.string().required().min(8).label("Password"),
   });
+
+  const handleUserLogin = async (data: ILogin) => {
+    const apiQuery: any = await loginUser(data);
+
+    if (apiQuery?.data?.success) {
+      props.setTransition(LoginFlow.otpLogin);
+    }
+  };
 
   return (
     <Container
@@ -76,8 +86,7 @@ const UserLogin: React.FC<IProps> = (props) => {
           validateOnBlur={false}
           validateOnMount={false}
           onSubmit={(data) => {
-            console.log(data);
-            props.setTransition(LoginFlow.otpLogin);
+            handleUserLogin(data);
           }}
         >
           {({ values, errors, handleChange, handleSubmit }) => (

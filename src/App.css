@@ -5,4 +5,23 @@ body {
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: auto;
+  font-family: "Arvo", serif;
+}
+
+.root {
+  font-family: "Arvo", serif;
+}
+
+.MuiButtonBase-root.MuiButton-root:hover,
+.MuiButtonBase-root.MuiListItemButton-root.Mui-selected:hover,
+.MuiButtonBase-root.MuiListItemButton-root:hover {
+  background-color: lightsalmon;
+}
+
+.MuiButtonBase-root.MuiIconButton-root:hover {
+  background-color: lavender;
+}
+
+.MuiButtonBase-root.MuiListItemButton-root.Mui-selected {
+  background-color: lavender;
 }
