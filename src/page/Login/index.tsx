@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import UserLogin from "./Login";
 import UserBackgroundImg from "../../assets/images/user-registration.jpg";
 import styled from "styled-components";
