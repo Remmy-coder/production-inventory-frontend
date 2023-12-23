@@ -1,9 +1,7 @@
 import {
   Box,
   Checkbox,
-  FormControlLabel,
   Paper,
-  Switch,
   Table,
   TableBody,
   TableCell,
