@@ -1,36 +1,26 @@
-import {
-  Avatar,
-  Box,
-  Container,
-  Typography,
-} from "@mui/material";
-import React, { useState, useEffect } from "react";
-import {
-  PersonAddAltRounded,
-} from "@mui/icons-material";
+import { Avatar, Box, Container, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { PersonAddAltRounded } from "@mui/icons-material";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { IUserRegistration } from "../../interfaces/user";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../app/store";
-import { toast } from "react-toastify";
-import { registerUser, reset } from "../../features/auth/userAuthSlice";
-import { AnyAction } from "@reduxjs/toolkit";
-import { ICompanyRegistration } from "../../interfaces/company";
 import UserCreationForm from "./SignupForms/UserCreationForm";
+import { useCreateUserMutation } from "../../services/userApi";
 
 const UserCreation: React.FC = () => {
-  const initialValues = {};
+  const initialValues = {} as unknown as IUserRegistration;
   const [initialState, setInitialState] =
-    useState<Partial<IUserRegistration>>(initialValues);
+    useState<IUserRegistration>(initialValues);
 
-  const company = localStorage.getItem("company");
-  const parsedCompany: ICompanyRegistration =
-    company !== null ? JSON.parse(company) : null;
+  const newlyCreatedCompanyId: string | null = localStorage.getItem(
+    "newlyCreatedCompanyId"
+  );
 
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+
+  const [createUser] = useCreateUserMutation();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -53,30 +43,17 @@ const UserCreation: React.FC = () => {
   });
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const { user, isLoading, isError, isSuccess, message } = useSelector(
-    (state: RootState) => state.userAuth
-  );
+  const handleSubmit = async (data: IUserRegistration) => {
+    const apiQuery: any = await createUser({
+      companyId: newlyCreatedCompanyId,
+      ...data,
+    });
 
-  useEffect(() => {
-    if (isError) {
-      toast.error(message);
-    }
-    if (isSuccess && user) {
-      toast.success("User created");
+    if (apiQuery?.data?.success) {
+      localStorage.removeItem("newlyCreatedCompanyId");
       navigate("/");
     }
-
-    dispatch(reset());
-  }, [user, isError, isSuccess, message, dispatch, navigate]);
-
-  const handleSubmit = (data: Partial<IUserRegistration>) => {
-    const userData = {
-      companyId: parsedCompany?.id,
-      ...data,
-    };
-    dispatch(registerUser(userData) as unknown as AnyAction);
   };
 
   //console.log(parsedCompany);
