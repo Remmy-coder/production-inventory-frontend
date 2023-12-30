@@ -105,7 +105,7 @@ function SupplierTableHead(props: SupplierTableHeadProps) {
               direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
             >
-              {headCell.label}
+              <h4>{headCell.label}</h4>
               {orderBy === headCell.id ? (
                 <Box component="span" sx={visuallyHidden}>
                   {order === "desc" ? "sorted descending" : "sorted ascending"}
@@ -114,6 +114,7 @@ function SupplierTableHead(props: SupplierTableHeadProps) {
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell />
       </TableRow>
     </TableHead>
   );

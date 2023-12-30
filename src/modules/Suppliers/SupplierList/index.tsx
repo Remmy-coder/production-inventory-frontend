@@ -1,6 +1,11 @@
 import {
+  Avatar,
   Box,
+  Button,
   Checkbox,
+  Collapse,
+  Grid,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -8,6 +13,8 @@ import {
   TableContainer,
   TablePagination,
   TableRow,
+  Typography,
+  styled,
 } from "@mui/material";
 import React from "react";
 import SupplierTableToolbar from "./supplierTableToolbar";
@@ -16,6 +23,9 @@ import { ISupplierObject } from "../../../interfaces/supplier";
 import { useGetAllSuppliersQuery } from "../../../services/supplierApi";
 import stableSort from "../../../utils/stableSortFunction";
 import descendingComparator from "../../../utils/descendingComparatorFunction";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { DeleteTwoTone, ModeEditTwoTone } from "@mui/icons-material";
 
 type Order = "asc" | "desc";
 
@@ -28,7 +38,17 @@ function getComparator<Key extends keyof ISupplierObject>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  color: theme.palette.text.secondary,
+}));
+
 const SupplierTable = () => {
+  const [expandedRowId, setExpandedRowId] = React.useState<{
+    [key: string]: boolean;
+  }>({});
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [order, setOrder] = React.useState<Order>("desc");
   const [orderBy, setOrderBy] =
@@ -85,6 +105,20 @@ const SupplierTable = () => {
     setSelected(newSelected);
   };
 
+  const handleExpand = (rowId: string) => {
+    setExpandedRowId((prevExpandedItems) => {
+      if (prevExpandedItems[rowId]) {
+        return { ...prevExpandedItems, [rowId]: false };
+      }
+      const updatedItems = { ...prevExpandedItems };
+      Object.keys(updatedItems).forEach((key) => {
+        updatedItems[key] = false;
+      });
+      updatedItems[rowId] = true;
+      return updatedItems;
+    });
+  };
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -131,42 +165,192 @@ const SupplierTable = () => {
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
-                  <TableRow
-                    hover
-                    onClick={(event) => handleClick(event, row.id || "")}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.id}
-                    selected={isItemSelected}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          "aria-labelledby": labelId,
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
+                  <React.Fragment>
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{
+                        cursor: "pointer",
+                        "& > *": { borderBottom: "unset" },
+                      }}
                     >
-                      {row.name}
-                    </TableCell>
-                    <TableCell>{row.country}</TableCell>
-                    <TableCell>{row.state}</TableCell>
-                    <TableCell>
-                      <a>{row.website}</a>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(row.createdAt).toDateString()}
-                    </TableCell>
-                  </TableRow>
+                      <TableCell
+                        padding="checkbox"
+                        onClick={(event) => handleClick(event, row.id || "")}
+                      >
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            "aria-labelledby": labelId,
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell
+                        onClick={(event) => handleClick(event, row.id || "")}
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        padding="none"
+                      >
+                        {row.name}
+                      </TableCell>
+                      <TableCell
+                        onClick={(event) => handleClick(event, row.id || "")}
+                      >
+                        {row.country}
+                      </TableCell>
+                      <TableCell
+                        onClick={(event) => handleClick(event, row.id || "")}
+                      >
+                        {row.state}
+                      </TableCell>
+                      <TableCell
+                        onClick={(event) => handleClick(event, row.id || "")}
+                      >
+                        <a>{row.website}</a>
+                      </TableCell>
+                      <TableCell
+                        onClick={(event) => handleClick(event, row.id || "")}
+                      >
+                        {new Date(row.createdAt).toDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          aria-label="expand row"
+                          size="small"
+                          onClick={() =>
+                            row.id !== undefined && handleExpand(row.id)
+                          }
+                        >
+                          {row.id !== undefined && expandedRowId[row?.id] ? (
+                            <KeyboardArrowUpIcon />
+                          ) : (
+                            <KeyboardArrowDownIcon />
+                          )}
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+
+                    <TableRow>
+                      <TableCell
+                        style={{ paddingBottom: 0, paddingTop: 0 }}
+                        colSpan={8}
+                      >
+                        <Collapse
+                          in={row.id !== undefined && expandedRowId[row?.id]}
+                          timeout="auto"
+                          unmountOnExit
+                        >
+                          <Box
+                            sx={{
+                              margin: 1,
+                              paddingX: 4,
+                              paddingY: 2,
+                            }}
+                          >
+                            <Grid container spacing={2}>
+                              <Grid
+                                item
+                                xs={5}
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                }}
+                              >
+                                <p>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    Contact's Firstname:
+                                  </span>{" "}
+                                  {row.supplierContact.firstName}
+                                </p>
+                                <p>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    Contact's Lastname:
+                                  </span>{" "}
+                                  {row.supplierContact.lastName}
+                                </p>
+                                <p>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    Contact's Email:
+                                  </span>{" "}
+                                  {row.supplierContact.email}
+                                </p>
+                              </Grid>
+                              <Grid
+                                item
+                                xs={5}
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                }}
+                              >
+                                <p>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    Contact's Phone Number:
+                                  </span>{" "}
+                                  {`${row.supplierContact.dialcode} ${row.supplierContact.phoneNumber}`}
+                                </p>
+                                <p>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    Supplier's Address:
+                                  </span>{" "}
+                                  {row.address}
+                                </p>
+                              </Grid>
+                              <Grid
+                                item
+                                xs={2}
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <IconButton
+                                  color="inherit"
+                                  aria-label="settings"
+                                >
+                                  <Avatar
+                                    sx={{
+                                      marginRight: 0,
+                                      backgroundColor: "white",
+                                      color: "slateblue",
+                                      height: 35,
+                                      width: 35,
+                                    }}
+                                  >
+                                    <ModeEditTwoTone fontSize="small" />
+                                  </Avatar>
+                                </IconButton>
+
+                                <IconButton
+                                  color="inherit"
+                                  aria-label="settings"
+                                >
+                                  <Avatar
+                                    sx={{
+                                      marginRight: 0,
+                                      backgroundColor: "white",
+                                      color: "slateblue",
+                                      height: 35,
+                                      width: 35,
+                                    }}
+                                  >
+                                    <DeleteTwoTone fontSize="small" />
+                                  </Avatar>
+                                </IconButton>
+                              </Grid>
+                            </Grid>
+                          </Box>
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
                 );
               })}
             </TableBody>
