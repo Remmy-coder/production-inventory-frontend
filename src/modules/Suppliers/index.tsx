@@ -8,12 +8,21 @@ const Suppliers = () => {
   const [openCreateDialog, setOpenCreateDialog] =
     React.useState<boolean>(false);
 
+  const [isEditingSupplier, setIsEditingSupplier] =
+    React.useState<boolean>(false);
+
   const handleClickOpenCreateDialog = (): void => {
     setOpenCreateDialog(true);
   };
 
   const handleCloseCreateDialog = () => {
     setOpenCreateDialog(false);
+    setIsEditingSupplier(false);
+  };
+
+  const handleStartIsEditingSupplier = () => {
+    setIsEditingSupplier(true);
+    setOpenCreateDialog(true);
   };
 
   return (
@@ -41,9 +50,12 @@ const Suppliers = () => {
       >
         Add Supplier
       </Button>
-      <SupplierTable />
+      <SupplierTable
+        handleStartIsEditingSupplier={handleStartIsEditingSupplier}
+      />
       <CreateSupplier
         openCreateDialog={openCreateDialog}
+        isEditingSupplier={isEditingSupplier}
         handleCloseCreateDialog={handleCloseCreateDialog}
       />
     </Box>

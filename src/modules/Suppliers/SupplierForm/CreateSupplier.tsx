@@ -1,19 +1,20 @@
 import { Dialog, DialogContent, DialogTitle } from "@mui/material";
-import { FormikProps, useFormik } from "formik";
+import { FormikProps, FormikProvider, useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import {
   ICreateSupplierFormValues,
   ISupplierObject,
 } from "../../../interfaces/supplier";
 import * as Yup from "yup";
-import CreateSupplierForm from "./CreateSupplierForm";
 import { AutocompleteOptionProps } from "../../../components/Inputs";
 import { countriesWithStates } from "../../../data";
 import { useCreateSupplierMutation } from "../../../services/supplierApi";
 import { parsedAuthenticatedUserObject } from "../../../common/apiConfig";
+import SupplierFormComponent from "./SupplierFormComponent";
 
 interface ICreateSupplierProps {
   openCreateDialog: boolean;
+  isEditingSupplier: boolean;
   handleCloseCreateDialog: () => void;
 }
 
@@ -110,7 +111,7 @@ const CreateSupplier: React.FC<ICreateSupplierProps> = (props) => {
     <React.Fragment>
       <Dialog
         fullWidth
-        maxWidth="md"
+        maxWidth="lg"
         open={props.openCreateDialog}
         onClose={props.handleCloseCreateDialog}
       >
@@ -119,14 +120,17 @@ const CreateSupplier: React.FC<ICreateSupplierProps> = (props) => {
             color: "slateblue",
           }}
         >
-          Create A New Supplier
+          {props.isEditingSupplier ? `Edit Supplier` : `Create A New Supplier`}
         </DialogTitle>
         <DialogContent>
-          <CreateSupplierForm
-            createSupplierForm={createSupplierForm}
-            setSelectedCountry={setSelectedCountry}
-            countryStateData={countryStateData}
-          />
+          <FormikProvider value={createSupplierForm}>
+            <SupplierFormComponent
+              createSupplierForm={createSupplierForm}
+              setSelectedCountry={setSelectedCountry}
+              countryStateData={countryStateData}
+              isEditingSupplier={props.isEditingSupplier}
+            />
+          </FormikProvider>
         </DialogContent>
       </Dialog>
     </React.Fragment>
