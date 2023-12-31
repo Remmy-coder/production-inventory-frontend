@@ -17,17 +17,21 @@ import {
   styled,
 } from "@mui/material";
 import React from "react";
-import SupplierTableToolbar from "./supplierTableToolbar";
-import SupplierTableHead from "./supplierTableHead";
 import { ISupplierObject } from "../../../interfaces/supplier";
 import { useGetAllSuppliersQuery } from "../../../services/supplierApi";
 import stableSort from "../../../utils/stableSortFunction";
 import descendingComparator from "../../../utils/descendingComparatorFunction";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { DeleteTwoTone, ModeEditTwoTone } from "@mui/icons-material";
+import SupplierTableHead from "./SupplierTableHead";
+import SupplierTableToolbar from "./SupplierTableToolbar";
+import CollapsibleTableCell from "./CollapsibleTableCell";
 
 type Order = "asc" | "desc";
+
+interface ISupplierList {
+  handleStartIsEditingSupplier: () => void;
+}
 
 function getComparator<Key extends keyof ISupplierObject>(
   order: Order,
@@ -38,14 +42,7 @@ function getComparator<Key extends keyof ISupplierObject>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  color: theme.palette.text.secondary,
-}));
-
-const SupplierTable = () => {
+const SupplierTable: React.FC<ISupplierList> = (props) => {
   const [expandedRowId, setExpandedRowId] = React.useState<{
     [key: string]: boolean;
   }>({});
@@ -237,118 +234,13 @@ const SupplierTable = () => {
                     </TableRow>
 
                     <TableRow>
-                      <TableCell
-                        style={{ paddingBottom: 0, paddingTop: 0 }}
-                        colSpan={8}
-                      >
-                        <Collapse
-                          in={row.id !== undefined && expandedRowId[row?.id]}
-                          timeout="auto"
-                          unmountOnExit
-                        >
-                          <Box
-                            sx={{
-                              margin: 1,
-                              paddingX: 4,
-                              paddingY: 2,
-                            }}
-                          >
-                            <Grid container spacing={2}>
-                              <Grid
-                                item
-                                xs={5}
-                                sx={{
-                                  display: "flex",
-                                  flexDirection: "column",
-                                }}
-                              >
-                                <p>
-                                  <span style={{ fontWeight: "bold" }}>
-                                    Contact's Firstname:
-                                  </span>{" "}
-                                  {row.supplierContact.firstName}
-                                </p>
-                                <p>
-                                  <span style={{ fontWeight: "bold" }}>
-                                    Contact's Lastname:
-                                  </span>{" "}
-                                  {row.supplierContact.lastName}
-                                </p>
-                                <p>
-                                  <span style={{ fontWeight: "bold" }}>
-                                    Contact's Email:
-                                  </span>{" "}
-                                  {row.supplierContact.email}
-                                </p>
-                              </Grid>
-                              <Grid
-                                item
-                                xs={5}
-                                sx={{
-                                  display: "flex",
-                                  flexDirection: "column",
-                                }}
-                              >
-                                <p>
-                                  <span style={{ fontWeight: "bold" }}>
-                                    Contact's Phone Number:
-                                  </span>{" "}
-                                  {`${row.supplierContact.dialcode} ${row.supplierContact.phoneNumber}`}
-                                </p>
-                                <p>
-                                  <span style={{ fontWeight: "bold" }}>
-                                    Supplier's Address:
-                                  </span>{" "}
-                                  {row.address}
-                                </p>
-                              </Grid>
-                              <Grid
-                                item
-                                xs={2}
-                                sx={{
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <IconButton
-                                  color="inherit"
-                                  aria-label="settings"
-                                >
-                                  <Avatar
-                                    sx={{
-                                      marginRight: 0,
-                                      backgroundColor: "white",
-                                      color: "slateblue",
-                                      height: 35,
-                                      width: 35,
-                                    }}
-                                  >
-                                    <ModeEditTwoTone fontSize="small" />
-                                  </Avatar>
-                                </IconButton>
-
-                                <IconButton
-                                  color="inherit"
-                                  aria-label="settings"
-                                >
-                                  <Avatar
-                                    sx={{
-                                      marginRight: 0,
-                                      backgroundColor: "white",
-                                      color: "slateblue",
-                                      height: 35,
-                                      width: 35,
-                                    }}
-                                  >
-                                    <DeleteTwoTone fontSize="small" />
-                                  </Avatar>
-                                </IconButton>
-                              </Grid>
-                            </Grid>
-                          </Box>
-                        </Collapse>
-                      </TableCell>
+                      <CollapsibleTableCell
+                        row={row}
+                        expandedRowId={expandedRowId}
+                        handleStartIsEditingSupplier={
+                          props.handleStartIsEditingSupplier
+                        }
+                      />
                     </TableRow>
                   </React.Fragment>
                 );

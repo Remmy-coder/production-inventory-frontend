@@ -5812,3 +5812,10 @@ export const gender: Gender[] = [
     value: "Female",
   },
 ];
+
+export const dialCodeList: { label: string; value: string }[] = countries.map(
+  ({ label, phone }) => ({
+    label: `${label}: +${phone}`,
+    value: `+${phone}`,
+  })
+);

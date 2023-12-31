@@ -1,32 +1,27 @@
-import { Form, FormikProps, FormikProvider } from "formik";
+import { Button, Grid } from "@mui/material";
+import { Box } from "@mui/system";
 import React from "react";
-import { ICreateSupplierFormValues } from "../../../interfaces/supplier";
-import { Box, Button, Grid } from "@mui/material";
 import {
   AutocompleteOptionProps,
   ReusableAutocomplete,
   ReusableCountryAutocomplete,
   ReusableTextField,
 } from "../../../components/Inputs";
-import { countries } from "../../../data";
 import { AddBoxRounded } from "@mui/icons-material";
+import { Form, FormikProps } from "formik";
+import { countries, dialCodeList } from "../../../data";
+import { ICreateSupplierFormValues } from "../../../interfaces/supplier";
 
-interface ICreateSupplierFormProps {
+interface ISupplierFormComponent {
+  isEditingSupplier: boolean;
   createSupplierForm: FormikProps<ICreateSupplierFormValues>;
   setSelectedCountry: React.Dispatch<React.SetStateAction<string | undefined>>;
   countryStateData: AutocompleteOptionProps[];
 }
 
-const CreateSupplierForm: React.FC<ICreateSupplierFormProps> = (props) => {
-  const dialCodeList: { label: string; value: string }[] = countries.map(
-    ({ label, phone }) => ({
-      label: `${label}: +${phone}`,
-      value: `+${phone}`,
-    })
-  );
-
+const SupplierFormComponent: React.FC<ISupplierFormComponent> = (props) => {
   return (
-    <FormikProvider value={props.createSupplierForm}>
+    <React.Fragment>
       <Box
         component={Form}
         noValidate
@@ -130,13 +125,13 @@ const CreateSupplierForm: React.FC<ICreateSupplierFormProps> = (props) => {
               endIcon={<AddBoxRounded />}
               type="submit"
             >
-              CREATE SUPPLIER
+              {props.isEditingSupplier ? `Edit Supplier` : `Create Supplier`}
             </Button>
           </Grid>
         </Grid>
       </Box>
-    </FormikProvider>
+    </React.Fragment>
   );
 };
 
-export default CreateSupplierForm;
+export default SupplierFormComponent;
